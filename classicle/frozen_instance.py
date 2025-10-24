@@ -1,6 +1,6 @@
 """Frozen instance decorator for creating immutable constant namespaces."""
 
-from typing import Any, Iterator
+from typing import Any, Iterator, Tuple
 
 
 def frozen_instance(cls: type) -> Any:
@@ -45,10 +45,10 @@ def frozen_instance(cls: type) -> Any:
             for name, value in attrs.items():
                 object.__setattr__(self, name, value)
 
-        def __iter__(self) -> Iterator[tuple[str, Any]]:
+        def __iter__(self) -> Iterator[Tuple[str, Any]]:
             """Make the instance iterable for dict() conversion."""
             for name in attrs:
-                yield (name, getattr(self, name))
+                yield (name, attrs[name])
 
         def __setattr__(self, name: str, value: Any) -> None:
             """Prevent modification of attributes after initialization."""

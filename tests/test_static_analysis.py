@@ -24,12 +24,24 @@ def _run_mypy(code: str) -> tuple[bool, str]:
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_file = Path(temp_dir) / "test.py"
         temp_file.write_text(code)
+        
+        # Use a temporary cache directory to avoid scanning project's .venv
+        cache_dir = Path(temp_dir) / ".mypy_cache"
 
         result = subprocess.run(
-            [sys.executable, "-m", "mypy", "--strict", str(temp_file)],
+            [
+                sys.executable,
+                "-m",
+                "mypy",
+                "--strict",
+                "--no-site-packages",
+                "--cache-dir",
+                str(cache_dir),
+                str(temp_file),
+            ],
             capture_output=True,
             text=True,
-            timeout=10,
+            timeout=30,
         )
         output = result.stdout
         if result.stderr:

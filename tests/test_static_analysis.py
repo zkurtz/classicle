@@ -21,11 +21,10 @@ def _run_mypy(code: str) -> tuple[bool, str]:
     Returns:
         Tuple of (success, output) where success is True if mypy passes
     """
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
-        f.write(code)
-        temp_file = Path(f.name)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_file = Path(temp_dir) / "test.py"
+        temp_file.write_text(code)
 
-    try:
         result = subprocess.run(
             [sys.executable, "-m", "mypy", "--strict", str(temp_file)],
             capture_output=True,
@@ -33,8 +32,6 @@ def _run_mypy(code: str) -> tuple[bool, str]:
             timeout=10,
         )
         return result.returncode == 0, result.stdout + result.stderr
-    finally:
-        temp_file.unlink()
 
 
 def test_typed_attributes_are_recognized():

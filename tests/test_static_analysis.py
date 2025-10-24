@@ -16,7 +16,7 @@ def _run_mypy(code: str) -> tuple[bool, str]:
     """Run mypy on the provided code and return success status and output.
 
     Args:
-        code: Python code to type check
+        code: Python code to type check (should only be hardcoded test strings)
 
     Returns:
         Tuple of (success, output) where success is True if mypy passes
@@ -31,7 +31,10 @@ def _run_mypy(code: str) -> tuple[bool, str]:
             text=True,
             timeout=10,
         )
-        return result.returncode == 0, result.stdout + result.stderr
+        output = result.stdout
+        if result.stderr:
+            output += f"\n--- stderr ---\n{result.stderr}"
+        return result.returncode == 0, output
 
 
 def test_typed_attributes_are_recognized():

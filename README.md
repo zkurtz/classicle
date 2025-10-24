@@ -1,12 +1,6 @@
 # classicle
 
-Immutable constant namespaces with dataclass-like ergonomics
-
-## Installation
-
-```bash
-pip install classicle
-```
+Immutable constant namespaces with dataclass-like ergonomics.
 
 ## Usage
 
@@ -82,6 +76,6 @@ except AttributeError as e:
     print(e)  # "Cannot delete attribute 'E' on frozen instance"
 ```
 
-## License
+## Installation
 
-MIT
+Install classicle: We're [on pypi](https://pypi.org/project/classicle/), so `uv add classicle`. If working directly on this repo, consider using the [simplest-possible virtual environment](https://gist.github.com/zkurtz/4c61572b03e667a7596a607706463543).

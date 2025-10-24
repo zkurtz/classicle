@@ -7,6 +7,7 @@ from classicle import frozen_instance
 
 def test_basic_usage():
     """Test basic usage of frozen_instance decorator."""
+
     @frozen_instance
     class Config:
         HOST = "localhost"
@@ -21,6 +22,7 @@ def test_basic_usage():
 
 def test_with_type_hints():
     """Test frozen_instance with type hints."""
+
     @frozen_instance
     class TypedConfig:
         HOST: str = "localhost"
@@ -34,6 +36,7 @@ def test_with_type_hints():
 
 def test_dict_conversion():
     """Test that dict(instance) works correctly."""
+
     @frozen_instance
     class Config:
         HOST = "localhost"
@@ -50,6 +53,7 @@ def test_dict_conversion():
 
 def test_iterable():
     """Test that the instance is iterable."""
+
     @frozen_instance
     class Config:
         A = 1
@@ -65,6 +69,7 @@ def test_iterable():
 
 def test_immutable_attributes():
     """Test that attributes cannot be modified after creation."""
+
     @frozen_instance
     class Config:
         HOST = "localhost"
@@ -76,6 +81,7 @@ def test_immutable_attributes():
 
 def test_cannot_delete_attributes():
     """Test that attributes cannot be deleted."""
+
     @frozen_instance
     class Config:
         HOST = "localhost"
@@ -87,6 +93,7 @@ def test_cannot_delete_attributes():
 
 def test_excludes_private_attributes():
     """Test that private attributes are not included."""
+
     @frozen_instance
     class Config:
         PUBLIC = "public"
@@ -101,11 +108,12 @@ def test_excludes_private_attributes():
 
 def test_excludes_methods():
     """Test that methods are not included in the frozen instance."""
+
     @frozen_instance
     class Config:
         VALUE = 42
 
-        def method(self):
+        def method(self) -> str:
             return "test"
 
     config_dict = dict(Config)
@@ -115,6 +123,7 @@ def test_excludes_methods():
 
 def test_repr():
     """Test the string representation of frozen instance."""
+
     @frozen_instance
     class Config:
         HOST = "localhost"
@@ -128,6 +137,7 @@ def test_repr():
 
 def test_multiple_instances_are_same():
     """Test that the decorator creates a singleton-like instance."""
+
     @frozen_instance
     class Config:
         VALUE = 42
@@ -140,6 +150,7 @@ def test_multiple_instances_are_same():
 
 def test_empty_class():
     """Test frozen_instance with an empty class."""
+
     @frozen_instance
     class EmptyConfig:
         pass
@@ -150,6 +161,7 @@ def test_empty_class():
 
 def test_various_types():
     """Test frozen_instance with various attribute types."""
+
     @frozen_instance
     class Config:
         STRING = "text"

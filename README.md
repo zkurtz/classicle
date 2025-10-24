@@ -1,11 +1,11 @@
 # classicle
 
-Immutable constant namespaces with dataclass-like ergonomics
+Immutable constant namespaces with dataclass-like ergonomics.
 
 ## Installation
 
 ```bash
-pip install classicle
+uv add classicle
 ```
 
 ## Usage
@@ -81,7 +81,3 @@ try:
 except AttributeError as e:
     print(e)  # "Cannot delete attribute 'E' on frozen instance"
 ```
-
-## License
-
-MIT

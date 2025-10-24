@@ -4,8 +4,7 @@ from typing import Any, Iterator, Tuple
 
 
 def frozen_instance(cls: type) -> Any:
-    """
-    A class decorator that defines the class as already-instantiated and non-instantiable.
+    """A class decorator that defines the class as already-instantiated and non-instantiable.
 
     The decorated class:
     - Is immediately instantiated
@@ -32,15 +31,11 @@ def frozen_instance(cls: type) -> Any:
         {'HOST': 'localhost', 'PORT': 8080, 'DEBUG': True}
     """
     # Get all class attributes (excluding special methods and private attributes)
-    attrs = {
-        name: value
-        for name, value in cls.__dict__.items()
-        if not name.startswith("_") and not callable(value)
-    }
+    attrs = {name: value for name, value in cls.__dict__.items() if not name.startswith("_") and not callable(value)}
 
     # Create a wrapper class that stores the attributes and makes the instance iterable
     class FrozenInstance:
-        def __init__(self):
+        def __init__(self) -> None:
             # Copy all public class attributes to the instance
             for name, value in attrs.items():
                 object.__setattr__(self, name, value)
@@ -53,16 +48,12 @@ def frozen_instance(cls: type) -> Any:
         def __setattr__(self, name: str, value: Any) -> None:
             """Prevent modification of attributes after initialization."""
             if hasattr(self, name):
-                raise AttributeError(
-                    f"Cannot modify attribute '{name}' on frozen instance"
-                )
+                raise AttributeError(f"Cannot modify attribute '{name}' on frozen instance")
             object.__setattr__(self, name, value)
 
         def __delattr__(self, name: str) -> None:
             """Prevent deletion of attributes."""
-            raise AttributeError(
-                f"Cannot delete attribute '{name}' on frozen instance"
-            )
+            raise AttributeError(f"Cannot delete attribute '{name}' on frozen instance")
 
         def __repr__(self) -> str:
             """Return a string representation of the frozen instance."""

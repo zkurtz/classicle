@@ -24,7 +24,7 @@ def _run_mypy(code: str) -> tuple[bool, str]:
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_file = Path(temp_dir) / "test.py"
         temp_file.write_text(code)
-        
+
         # Use a temporary cache directory to avoid scanning project's .venv
         cache_dir = Path(temp_dir) / ".mypy_cache"
 

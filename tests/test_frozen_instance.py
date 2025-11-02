@@ -43,7 +43,7 @@ def test_dict_conversion():
         PORT = 8080
         DEBUG = True
 
-    config_dict = dict(Config)
+    config_dict = dict(Config)  # type: ignore[no-matching-overload]
     assert config_dict == {
         "HOST": "localhost",
         "PORT": 8080,
@@ -60,7 +60,7 @@ def test_iterable():
         B = 2
         C = 3
 
-    items = list(Config)
+    items = list(Config)  # type: ignore[invalid-argument-type]
     assert len(items) == 3
     assert ("A", 1) in items
     assert ("B", 2) in items
@@ -100,7 +100,7 @@ def test_excludes_private_attributes():
         _PRIVATE = "private"
         __DUNDER = "dunder"
 
-    config_dict = dict(Config)
+    config_dict = dict(Config)  # type: ignore[no-matching-overload]
     assert "PUBLIC" in config_dict
     assert "_PRIVATE" not in config_dict
     assert "__DUNDER" not in config_dict
@@ -116,7 +116,7 @@ def test_excludes_methods():
         def method(self) -> str:
             return "test"
 
-    config_dict = dict(Config)
+    config_dict = dict(Config)  # type: ignore[no-matching-overload]
     assert "VALUE" in config_dict
     assert "method" not in config_dict
 
@@ -155,7 +155,7 @@ def test_empty_class():
     class EmptyConfig:
         pass
 
-    config_dict = dict(EmptyConfig)
+    config_dict = dict(EmptyConfig)  # type: ignore[no-matching-overload]
     assert config_dict == {}
 
 
@@ -182,5 +182,5 @@ def test_various_types():
     assert Config.DICT == {"key": "value"}
     assert Config.TUPLE == (1, 2, 3)
 
-    config_dict = dict(Config)
+    config_dict = dict(Config)  # type: ignore[no-matching-overload]
     assert len(config_dict) == 8

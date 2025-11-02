@@ -60,7 +60,7 @@ def test_iterable():
         B = 2
         C = 3
 
-    items = list(Config)
+    items = list(Config)  # type: ignore[invalid-argument-type]
     assert len(items) == 3
     assert ("A", 1) in items
     assert ("B", 2) in items

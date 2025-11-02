@@ -1,65 +1,39 @@
 # classicle
 
-Defines the `frozen_instance` class decorator to provide immutable constant namespaces with dataclass-like ergonomics. See the [Python discussion thread](https://discuss.python.org/t/constants-namespace-with-dataclass-like-features/91547) for context, motivation, and alternative approaches.
+Provides immutable constant namespaces with dataclass-like ergonomics. See the [Python discussion thread](https://discuss.python.org/t/constants-namespace-with-dataclass-like-features/91547) for context, motivation, and alternative approaches.
 
-## Usage
-
-The `frozen_instance` decorator creates an immutable, already-instantiated class that behaves like a constant namespace. This is perfect for configuration objects, constants, and other immutable data structures.
-
-### Basic Example
+Example:
 
 ```python
-from classicle import frozen_instance
+from classicle import FrozenSpace
 
-@frozen_instance
-class Config:
+class Config(FrozenSpace):
     HOST = "localhost"
-    PORT = 8080
+    PORT: int = 8080  # add type hints only when you want them
     DEBUG = True
 
-# Access attributes
-print(Config.HOST)  # "localhost"
-print(Config.PORT)  # 8080
 
-# Convert to dictionary
+print(Config.HOST)  # "localhost"; Type checker knows this is a str
+print(Config.PORT)  # 8080
 config_dict = dict(Config)
 # {'HOST': 'localhost', 'PORT': 8080, 'DEBUG': True}
 
 # Iterate over attributes
-for name, value in Config:
+for name, value in Config.items():
     print(f"{name} = {value}")
-```
-
-### With Type Hints
-
-```python
-@frozen_instance
-class DatabaseConfig:
-    HOST: str = "localhost"
-    PORT: int = 5432
-    USERNAME: str = "admin"
-    PASSWORD: str = "secret"
-    DATABASE: str = "mydb"
-
-# Type hints are preserved for static type checkers
-print(DatabaseConfig.HOST)  # Type checker knows this is a str
 ```
 
 ### Features
 
-- **Already instantiated**: No need to create an instance, the class itself is the instance
-- **Immutable**: Attributes cannot be modified or deleted after creation
-- **Iterable**: Works with `dict()`, can be used in for loops
-- **Type hints**: Supports optional type hints for better IDE support
-- **Clean syntax**: Similar to dataclasses but for constant values
-- **No methods included**: Only data attributes are exposed (methods are excluded)
-- **No private attributes**: Attributes starting with `_` are not included
+- **Type checker friendly**
+- **No instantiation needed**: The class itself is the namespace (cannot be instantiated)
+- **Immutable**: Attributes cannot be modified (at the top level) or deleted after creation
+- **Mapping protocol**: Supports `dict()`, `len()`, `in`, iteration, `.items()`, `.keys()`, `.values()`
 
 ### Immutability
 
 ```python
-@frozen_instance
-class Constants:
+class Constants(FrozenSpace):
     PI = 3.14159
     E = 2.71828
 
@@ -67,13 +41,19 @@ class Constants:
 try:
     Constants.PI = 3.14
 except AttributeError as e:
-    print(e)  # "Cannot modify attribute 'PI' on frozen instance"
+    print(e)  # "Cannot modify attribute 'PI' on frozen namespace"
 
 # This will also raise an AttributeError
 try:
     del Constants.E
 except AttributeError as e:
-    print(e)  # "Cannot delete attribute 'E' on frozen instance"
+    print(e)  # "Cannot delete attribute 'E' on frozen namespace"
+
+# Cannot instantiate FrozenSpace classes
+try:
+    instance = Constants()
+except TypeError as e:
+    print(e)  # "Cannot instantiate Constants..."
 ```
 
 ## Installation

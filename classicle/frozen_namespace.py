@@ -19,8 +19,8 @@ def _is_instance_method(func: Any) -> bool:
         return False
     try:
         sig = inspect.signature(func)
-        params = list(sig.parameters.keys())
-        return len(params) > 0 and params[0] == "self"
+        first_param = next(iter(sig.parameters), None)
+        return first_param == "self"
     except (ValueError, TypeError):
         # Can't get signature, assume it's not an instance method
         return False

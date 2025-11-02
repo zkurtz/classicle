@@ -52,7 +52,12 @@ class FrozenSpaceMeta(type, Mapping[str, Any], metaclass=_FrozenSpaceMetaMeta):
             A new class that acts as a frozen namespace
         """
         # Extract only public non-callable attributes (constants)
-        attrs = {k: v for k, v in namespace.items() if not k.startswith("_") and not callable(v)}
+        # Exclude callable items and classmethods (which are not callable but are methods)
+        attrs = {
+            k: v
+            for k, v in namespace.items()
+            if not k.startswith("_") and not callable(v) and not isinstance(v, classmethod)
+        }
 
         # Create new namespace with only essential items
         new_namespace = {
@@ -62,6 +67,11 @@ class FrozenSpaceMeta(type, Mapping[str, Any], metaclass=_FrozenSpaceMetaMeta):
             "__doc__": namespace.get("__doc__"),
             "__annotations__": namespace.get("__annotations__", {}),
         }
+
+        # Preserve methods (including classmethods and staticmethods) in the namespace
+        for k, v in namespace.items():
+            if not k.startswith("_") and (callable(v) or isinstance(v, classmethod)):
+                new_namespace[k] = v
 
         cls = super().__new__(mcs, name, bases, new_namespace)
         return cls

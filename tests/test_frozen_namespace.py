@@ -265,3 +265,76 @@ def test_subclasses_access():
     # Should be able to access __subclasses__ without error
     subclasses = Config.__subclasses__()
     assert isinstance(subclasses, list)
+
+
+def test_classmethod_support():
+    """Test that classmethods work correctly."""
+
+    class Config(FrozenSpace):
+        greeting: str = "hello"
+
+        @classmethod
+        def greet(cls) -> str:
+            return cls.greeting
+
+        @classmethod
+        def greet_with_suffix(cls, suffix: str) -> str:
+            return f"{cls.greeting}{suffix}"
+
+    # Classmethods should be callable
+    assert Config.greet() == "hello"
+    assert Config.greet_with_suffix("!") == "hello!"
+
+    # Classmethods should not be in the dict representation
+    config_dict = dict(Config)
+    assert "greeting" in config_dict
+    assert "greet" not in config_dict
+    assert "greet_with_suffix" not in config_dict
+
+
+def test_staticmethod_support():
+    """Test that staticmethods work correctly."""
+
+    class Config(FrozenSpace):
+        value: int = 42
+
+        @staticmethod
+        def static_func() -> str:
+            return "static result"
+
+        @staticmethod
+        def add(a: int, b: int) -> int:
+            return a + b
+
+    # Staticmethods should be callable
+    assert Config.static_func() == "static result"
+    assert Config.add(1, 2) == 3
+
+    # Staticmethods should not be in the dict representation
+    config_dict = dict(Config)
+    assert "value" in config_dict
+    assert "static_func" not in config_dict
+    assert "add" not in config_dict
+
+
+def test_mixed_methods():
+    """Test that classmethods and staticmethods can coexist."""
+
+    class Config(FrozenSpace):
+        name: str = "test"
+
+        @classmethod
+        def get_name(cls) -> str:
+            return cls.name
+
+        @staticmethod
+        def process(text: str) -> str:
+            return text.upper()
+
+    # Both method types should work
+    assert Config.get_name() == "test"
+    assert Config.process("hello") == "HELLO"
+
+    # Neither should be in the dict representation
+    config_dict = dict(Config)
+    assert config_dict == {"name": "test"}

@@ -1,10 +1,38 @@
 """Metaclass-based frozen namespace implementation."""
 
+import abc
 from collections.abc import Mapping
 from typing import Any, Iterator
 
 
-class FrozenSpaceMeta(type, Mapping[str, Any]):
+class _FrozenSpaceMetaMeta(abc.ABCMeta):
+    """Metaclass for FrozenSpaceMeta that fixes ABC machinery issues.
+
+    When FrozenSpaceMeta (which inherits from both type and Mapping) is checked
+    by ABC's __subclasscheck__, it tries to access __subclasses__() which fails.
+    This metaclass overrides __subclasscheck__ to use type's behavior instead of
+    ABCMeta's for FrozenSpaceMeta itself, while allowing normal ABC behavior
+    for instances of FrozenSpaceMeta.
+    """
+
+    def __subclasscheck__(cls, subclass: type) -> bool:
+        """Check if subclass is a subclass of cls.
+
+        Args:
+            subclass: The class to check
+
+        Returns:
+            True if subclass is a subclass of cls
+        """
+        # If cls is FrozenSpaceMeta, use type's __subclasscheck__ to avoid
+        # ABCMeta's machinery which tries to access __subclasses__()
+        if cls.__name__ == "FrozenSpaceMeta":
+            return type.__subclasscheck__(cls, subclass)
+        # Otherwise use ABCMeta's default behavior
+        return super().__subclasscheck__(subclass)
+
+
+class FrozenSpaceMeta(type, Mapping[str, Any], metaclass=_FrozenSpaceMetaMeta):
     """Metaclass that makes the class itself act as a frozen mapping.
 
     This allows the class to be used directly without instantiation,
@@ -70,6 +98,17 @@ class FrozenSpaceMeta(type, Mapping[str, Any]):
             return cls.__attrs__[key]
         raise KeyError(key)
 
+    def __hash__(cls) -> int:
+        """Return hash of the class.
+
+        Restores hashability which is needed for ABC checks and other Python internals.
+        Mapping sets __hash__ = None, but we need classes to be hashable.
+
+        Returns:
+            Hash value for the class
+        """
+        return type.__hash__(cls)
+
     def __getattribute__(cls, name: str) -> Any:
         """Get attribute value by name (attribute access).
 
@@ -82,8 +121,9 @@ class FrozenSpaceMeta(type, Mapping[str, Any]):
         Returns:
             Attribute value
         """
-        # Special attributes need normal resolution
-        if name in ("__attrs__", "__class__", "__dict__", "__module__", "__qualname__", "__doc__", "__annotations__"):
+        # Let all dunder methods go through normal resolution
+        # This ensures Python's internal mechanisms (ABC checks, etc.) work correctly
+        if name.startswith("__") and name.endswith("__"):
             return super().__getattribute__(name)
 
         # Check if it's one of our frozen attributes

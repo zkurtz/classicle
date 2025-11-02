@@ -221,3 +221,47 @@ def test_cannot_instantiate():
 
     with pytest.raises(TypeError, match="Cannot instantiate Config"):
         Config()
+
+
+def test_abc_isinstance_check():
+    """Test that isinstance check with Mapping works (issue: metaclass breaking ABC checks)."""
+    from collections.abc import Mapping as ABCMapping
+
+    class Config(FrozenSpace):
+        HOST = "localhost"
+        PORT = 8080
+
+    # The main use case from the issue: isinstance should work
+    assert isinstance(Config, ABCMapping)
+
+    # Verify it still works as a Mapping
+    assert len(Config) == 2
+    assert "HOST" in Config
+    assert "PORT" in Config
+    assert Config["HOST"] == "localhost"
+
+
+def test_metaclass_is_hashable():
+    """Test that the metaclass is hashable (needed for ABC checks)."""
+
+    class Config(FrozenSpace):
+        VALUE = 42
+
+    # Should be able to hash the class (needed for issubclass checks)
+    h = hash(Config)
+    assert isinstance(h, int)
+
+    # Should be able to use in sets/dicts
+    class_set = {Config}
+    assert Config in class_set
+
+
+def test_subclasses_access():
+    """Test that __subclasses__() can be accessed without error."""
+
+    class Config(FrozenSpace):
+        VALUE = 42
+
+    # Should be able to access __subclasses__ without error
+    subclasses = Config.__subclasses__()
+    assert isinstance(subclasses, list)

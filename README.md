@@ -1,8 +1,6 @@
 # classicle
 
-Immutable constant namespaces with dataclass-like ergonomics.
-
-**Currently, classicle provides a single decorator: `frozen_instance`.** For background on the motivation and history behind this decorator, see the [Python discussion thread](https://discuss.python.org/t/constants-namespace-with-dataclass-like-features/91547).
+Defines the `frozen_instance` class decorator to provide immutable constant namespaces with dataclass-like ergonomics. See the [Python discussion thread](https://discuss.python.org/t/constants-namespace-with-dataclass-like-features/91547) for context, motivation, and alternative approaches.
 
 ## Usage
 

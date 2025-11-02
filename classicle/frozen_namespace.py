@@ -1,8 +1,29 @@
 """Metaclass-based frozen namespace implementation."""
 
 import abc
+import inspect
 from collections.abc import Mapping
 from typing import Any, Iterator
+
+
+def _is_instance_method(func: Any) -> bool:
+    """Check if a callable is an instance method (has 'self' as first parameter).
+
+    Args:
+        func: The callable to check
+
+    Returns:
+        True if the callable is an instance method, False otherwise
+    """
+    if not callable(func):
+        return False
+    try:
+        sig = inspect.signature(func)
+        params = list(sig.parameters.keys())
+        return len(params) > 0 and params[0] == "self"
+    except (ValueError, TypeError):
+        # Can't get signature, assume it's not an instance method
+        return False
 
 
 class _FrozenSpaceMetaMeta(abc.ABCMeta):
@@ -51,13 +72,21 @@ class FrozenSpaceMeta(type, Mapping[str, Any], metaclass=_FrozenSpaceMetaMeta):
         Returns:
             A new class that acts as a frozen namespace
         """
-        # Extract only public non-callable attributes (constants)
-        # Exclude callable items and classmethods (which are not callable but are methods)
-        attrs = {
-            k: v
-            for k, v in namespace.items()
-            if not k.startswith("_") and not callable(v) and not isinstance(v, classmethod)
-        }
+        # Extract public attributes, including callable attributes that are not
+        # instance methods, classmethods, or staticmethods
+        attrs = {}
+        for k, v in namespace.items():
+            if k.startswith("_"):
+                # Skip private/dunder attributes
+                continue
+            if isinstance(v, (classmethod, staticmethod)):
+                # Skip classmethods and staticmethods
+                continue
+            if callable(v) and _is_instance_method(v):
+                # Skip instance methods (functions with 'self' as first parameter)
+                continue
+            # Include everything else (non-callables and callables that aren't methods)
+            attrs[k] = v
 
         # Create new namespace with only essential items
         new_namespace = {

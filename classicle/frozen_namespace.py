@@ -52,13 +52,11 @@ class FrozenSpaceMeta(type, Mapping[str, Any], metaclass=_FrozenSpaceMetaMeta):
             A new class that acts as a frozen namespace
         """
         # Extract only public non-callable attributes (constants)
-        # Exclude callable items and descriptors like classmethod/staticmethod
+        # Exclude callable items and classmethods (which are not callable but are methods)
         attrs = {
             k: v
             for k, v in namespace.items()
-            if not k.startswith("_")
-            and not callable(v)
-            and not isinstance(v, (classmethod, staticmethod))
+            if not k.startswith("_") and not callable(v) and not isinstance(v, classmethod)
         }
 
         # Create new namespace with only essential items
@@ -72,7 +70,7 @@ class FrozenSpaceMeta(type, Mapping[str, Any], metaclass=_FrozenSpaceMetaMeta):
 
         # Preserve methods (including classmethods and staticmethods) in the namespace
         for k, v in namespace.items():
-            if not k.startswith("_") and (callable(v) or isinstance(v, (classmethod, staticmethod))):
+            if not k.startswith("_") and (callable(v) or isinstance(v, classmethod)):
                 new_namespace[k] = v
 
         cls = super().__new__(mcs, name, bases, new_namespace)
@@ -142,11 +140,7 @@ class FrozenSpaceMeta(type, Mapping[str, Any], metaclass=_FrozenSpaceMetaMeta):
         try:
             attrs = super().__getattribute__("__attrs__")
             if name in attrs:
-                value = attrs[name]
-                # Let descriptors (like classmethod, staticmethod) work properly
-                if hasattr(value, "__get__"):
-                    return value.__get__(None, cls)
-                return value
+                return attrs[name]
         except AttributeError:
             pass
 

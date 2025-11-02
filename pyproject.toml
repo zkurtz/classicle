@@ -61,4 +61,5 @@ ban-relative-imports = "all"
 "test_*.py" = [
   "D", # would put requirements on docstrings in test files
   "ANN201", # would require return type hint (normally None) for test functions
+  "E731", # would disallow lambda expressions (but we need to test lambda support)
 ]

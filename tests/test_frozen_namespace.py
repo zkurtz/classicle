@@ -338,3 +338,21 @@ def test_mixed_methods():
     # Neither should be in the dict representation
     config_dict = dict(Config)
     assert config_dict == {"name": "test"}
+
+
+def test_callable_attributes():
+    """Test that callable attributes (lambdas) are supported."""
+
+    class Foo(FrozenSpace):
+        """Example of a FrozenSpace that has a lambda attribute."""
+
+        greet = lambda x: f"hello {x}"
+
+    # Lambda should be callable via attribute access
+    assert Foo.greet("world") == "hello world"
+
+    # Lambda should be in the dict representation
+    foo_dict = dict(Foo)
+    assert "greet" in foo_dict
+    assert callable(foo_dict["greet"])
+    assert foo_dict["greet"]("world") == "hello world"

@@ -1,7 +1,7 @@
-"""Tests for static type checking behavior of frozen_instance.
+"""Tests for static type checking behavior of FrozenSpace.
 
 This module verifies that type checkers like mypy can correctly understand
-the types of attributes in frozen_instance classes, which is a key selling
+the types of attributes in FrozenSpace classes, which is a key selling
 point over alternatives like Enum.
 """
 
@@ -52,10 +52,9 @@ def _run_mypy(code: str) -> tuple[bool, str]:
 def test_typed_attributes_are_recognized():
     """Test that mypy recognizes the types of typed attributes."""
     code = dedent("""
-        from classicle import frozen_instance
+        from classicle import FrozenSpace
 
-        @frozen_instance
-        class Config:
+        class Config(FrozenSpace):
             HOST: str = "localhost"
             PORT: int = 8080
             DEBUG: bool = True
@@ -73,10 +72,10 @@ def test_typed_attributes_are_recognized():
 def test_type_errors_are_detected():
     """Test that mypy detects type mismatches."""
     code = dedent("""
-        from classicle import frozen_instance
+        from classicle import FrozenSpace
 
-        @frozen_instance
-        class Config:
+        # Using FrozenSpace
+        class Config(FrozenSpace):
             HOST: str = "localhost"
             PORT: int = 8080
 
@@ -96,10 +95,10 @@ def test_type_errors_are_detected():
 def test_untyped_attributes_inferred():
     """Test that untyped attributes have their types inferred from values."""
     code = dedent("""
-        from classicle import frozen_instance
+        from classicle import FrozenSpace
 
-        @frozen_instance
-        class Config:
+        # Using FrozenSpace
+        class Config(FrozenSpace):
             HOST = "localhost"
             PORT = 8080
             DEBUG = True
@@ -117,10 +116,10 @@ def test_untyped_attributes_inferred():
 def test_mixed_typed_untyped_attributes():
     """Test classes with both typed and untyped attributes."""
     code = dedent("""
-        from classicle import frozen_instance
+        from classicle import FrozenSpace
 
-        @frozen_instance
-        class Config:
+        # Using FrozenSpace
+        class Config(FrozenSpace):
             HOST: str = "localhost"
             PORT = 8080
             DEBUG: bool = True
@@ -139,10 +138,10 @@ def test_mixed_typed_untyped_attributes():
 def test_complex_types():
     """Test that complex types like lists and dicts are recognized."""
     code = dedent("""
-        from classicle import frozen_instance
+        from classicle import FrozenSpace
 
-        @frozen_instance
-        class Config:
+        # Using FrozenSpace
+        class Config(FrozenSpace):
             SERVERS: list[str] = ["server1", "server2"]
             SETTINGS: dict[str, int] = {"max_connections": 100}
             PORTS: tuple[int, ...] = (8080, 8081, 8082)
@@ -159,10 +158,10 @@ def test_complex_types():
 def test_none_type():
     """Test that None and Optional types work correctly."""
     code = dedent("""
-        from classicle import frozen_instance
+        from classicle import FrozenSpace
 
-        @frozen_instance
-        class Config:
+        # Using FrozenSpace
+        class Config(FrozenSpace):
             HOST: str | None = None
             PORT: int | None = 8080
 
@@ -175,17 +174,17 @@ def test_none_type():
 
 
 def test_comparison_with_enum():
-    """Test that frozen_instance provides better type checking than Enum.
+    """Test that FrozenSpace provides better type checking than Enum.
 
     This demonstrates the key selling point: type checkers know the actual types
     of the values, not just that they're enum members.
     """
-    # frozen_instance preserves value types
+    # FrozenSpace preserves value types
     frozen_code = dedent("""
-        from classicle import frozen_instance
+        from classicle import FrozenSpace
 
-        @frozen_instance
-        class Config:
+        # Using FrozenSpace
+        class Config(FrozenSpace):
             HOST: str = "localhost"
             PORT: int = 8080
 
@@ -197,7 +196,7 @@ def test_comparison_with_enum():
     """)
 
     success, output = _run_mypy(frozen_code)
-    assert success, f"frozen_instance should work with typed functions, but got:\n{output}"
+    assert success, f"FrozenSpace should work with typed functions, but got:\n{output}"
 
     # Enum would require .value access
     enum_code = dedent("""

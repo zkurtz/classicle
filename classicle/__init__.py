@@ -1,5 +1,5 @@
 """Immutable constant namespaces with dataclass-like ergonomics."""
 
-from classicle.frozen_instance import frozen_instance
+from classicle.frozen_namespace import FrozenSpace
 
-__all__ = ["frozen_instance"]
+__all__ = ["FrozenSpace"]
